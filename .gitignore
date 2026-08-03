@@ -1,0 +1,10 @@
+# VIP Karvan QR Menyu
+/vendor/
+composer.lock
+.env
+*.log
+public/uploads/categories/*
+public/uploads/products/*
+public/uploads/settings/*
+!public/uploads/**/.htaccess
+!public/uploads/**/.gitkeep
