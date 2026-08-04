@@ -8,8 +8,11 @@ use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\ProductController;
 use App\Controllers\Admin\QrController;
 use App\Controllers\Admin\SettingController;
+use App\Controllers\FavoriteController;
 use App\Controllers\HomeController;
+use App\Controllers\LangController;
 use App\Controllers\MenuController;
+use App\Controllers\ViewController;
 use App\Core\Router;
 
 $router = new Router();
@@ -17,6 +20,10 @@ $router = new Router();
 // Public
 $router->get('/', HomeController::class, 'index');
 $router->get('/menu/{slug}', MenuController::class, 'category');
+$router->get('/lang/{locale}', LangController::class, 'switch');
+$router->post('/api/views', ViewController::class, 'track');
+$router->get('/api/favorites', FavoriteController::class, 'index');
+$router->post('/api/favorites', FavoriteController::class, 'sync');
 
 // Admin auth
 $router->get('/admin/login', AuthController::class, 'loginForm');

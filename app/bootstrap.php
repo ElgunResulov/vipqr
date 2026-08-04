@@ -42,3 +42,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
         'use_strict_mode' => true,
     ]);
 }
+
+\App\Core\Lang::boot();
+\App\Core\Guest::boot();

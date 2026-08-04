@@ -45,6 +45,60 @@ function upload_url(?string $path): string
     return base_url('uploads/' . ltrim($path, '/'));
 }
 
+/**
+ * Absolute URL for an uploaded file, or null when empty.
+ */
+function uploaded_url(?string $path): ?string
+{
+    if ($path === null || trim($path) === '') {
+        return null;
+    }
+
+    return base_url('uploads/' . ltrim($path, '/'));
+}
+
+/**
+ * Hero atmosphere video: custom upload first, then bundled default clip.
+ *
+ * @param array<string, mixed> $settings
+ */
+function hero_video_url(array $settings): ?string
+{
+    $custom = uploaded_url(isset($settings['hero_video']) ? (string) $settings['hero_video'] : null);
+    if ($custom !== null) {
+        return $custom;
+    }
+
+    $defaultRel = 'media/hero-ambiance.mp4';
+    $defaultAbs = dirname(__DIR__, 2) . '/public/assets/' . $defaultRel;
+    if (is_file($defaultAbs)) {
+        return asset($defaultRel);
+    }
+
+    return null;
+}
+
+/**
+ * Hero poster still for video / reduced-motion fallback.
+ *
+ * @param array<string, mixed> $settings
+ */
+function hero_poster_url(array $settings): string
+{
+    $custom = uploaded_url(isset($settings['hero_poster']) ? (string) $settings['hero_poster'] : null);
+    if ($custom !== null) {
+        return $custom;
+    }
+
+    $defaultRel = 'media/hero-poster.jpg';
+    $defaultAbs = dirname(__DIR__, 2) . '/public/assets/' . $defaultRel;
+    if (is_file($defaultAbs)) {
+        return asset($defaultRel);
+    }
+
+    return asset('img/placeholder.svg');
+}
+
 function redirect(string $path): never
 {
     if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
@@ -103,7 +157,51 @@ function slugify(string $text): string
 
 function money_azn(float|string $amount): string
 {
-    return number_format((float) $amount, 2, '.', ' ') . ' ₼';
+    return number_format((float) $amount, 2, '.', ' ') . ' ' . __('currency');
+}
+
+function __(string $key, array $replace = []): string
+{
+    return \App\Core\Lang::getLine($key, $replace);
+}
+
+function locale(): string
+{
+    return \App\Core\Lang::get();
+}
+
+/**
+ * @param array<string, mixed> $row
+ */
+function localized(array $row, string $field): string
+{
+    return \App\Core\Lang::field($row, $field);
+}
+
+function setting_localized(array $settings, string $key, ?string $fallbackKey = null): string
+{
+    $locale = locale();
+    if ($locale !== 'az') {
+        $localized = trim((string) ($settings[$key . '_' . $locale] ?? ''));
+        if ($localized !== '') {
+            return $localized;
+        }
+    }
+
+    $base = trim((string) ($settings[$key] ?? ''));
+    if ($base !== '') {
+        return $base;
+    }
+
+    return $fallbackKey !== null ? __($fallbackKey) : '';
+}
+
+function lang_url(string $locale): string
+{
+    $referer = $_SERVER['HTTP_REFERER'] ?? base_url();
+    $safeReferer = str_starts_with($referer, base_url()) ? $referer : base_url();
+
+    return base_url('lang/' . $locale) . '?redirect=' . rawurlencode($safeReferer);
 }
 
 function csrf_field(): string

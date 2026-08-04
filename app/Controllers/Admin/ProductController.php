@@ -88,7 +88,7 @@ final class ProductController extends Controller
             $this->redirect('/admin/products');
         }
 
-        $data = $this->validate($_POST);
+        $data = $this->validate($_POST, (int) $id);
         if ($data === null) {
             $this->redirect('/admin/products/' . $id . '/edit');
         }
@@ -132,24 +132,36 @@ final class ProductController extends Controller
         $this->redirect('/admin/products');
     }
 
-    private function validate(array $input): ?array
+    private function validate(array $input, ?int $excludeId = null): ?array
     {
         $name = trim((string) ($input['name'] ?? ''));
+        $nameRu = trim((string) ($input['name_ru'] ?? ''));
+        $nameEn = trim((string) ($input['name_en'] ?? ''));
         $description = trim((string) ($input['description'] ?? ''));
+        $descriptionRu = trim((string) ($input['description_ru'] ?? ''));
+        $descriptionEn = trim((string) ($input['description_en'] ?? ''));
         $categoryId = (int) ($input['category_id'] ?? 0);
         $price = str_replace(',', '.', trim((string) ($input['price'] ?? '0')));
         $sortOrder = (int) ($input['sort_order'] ?? 0);
         $isActive = isset($input['is_active']) ? 1 : 0;
         $isAvailable = isset($input['is_available']) ? 1 : 0;
+        $isFeatured = isset($input['is_featured']) ? 1 : 0;
+        $isPopular = isset($input['is_popular']) ? 1 : 0;
 
         store_old([
             'name' => $name,
+            'name_ru' => $nameRu,
+            'name_en' => $nameEn,
             'description' => $description,
+            'description_ru' => $descriptionRu,
+            'description_en' => $descriptionEn,
             'category_id' => (string) $categoryId,
             'price' => $price,
             'sort_order' => (string) $sortOrder,
             'is_active' => (string) $isActive,
             'is_available' => (string) $isAvailable,
+            'is_featured' => (string) $isFeatured,
+            'is_popular' => (string) $isPopular,
         ]);
 
         if ($name === '') {
@@ -167,14 +179,30 @@ final class ProductController extends Controller
             return null;
         }
 
+        if ($isFeatured === 1 && Product::countFeatured($excludeId) >= 2) {
+            flash('error', 'Maksimum 2 şef tövsiyəsi seçilə bilər.');
+            return null;
+        }
+
+        if ($isPopular === 1 && Product::countPopular($excludeId) >= 6) {
+            flash('error', 'Maksimum 6 populyar məhsul seçilə bilər.');
+            return null;
+        }
+
         return [
             'name' => $name,
+            'name_ru' => $nameRu !== '' ? $nameRu : null,
+            'name_en' => $nameEn !== '' ? $nameEn : null,
             'description' => $description !== '' ? $description : null,
+            'description_ru' => $descriptionRu !== '' ? $descriptionRu : null,
+            'description_en' => $descriptionEn !== '' ? $descriptionEn : null,
             'category_id' => $categoryId,
             'price' => number_format((float) $price, 2, '.', ''),
             'sort_order' => $sortOrder,
             'is_active' => $isActive,
             'is_available' => $isAvailable,
+            'is_featured' => $isFeatured,
+            'is_popular' => $isPopular,
         ];
     }
 }

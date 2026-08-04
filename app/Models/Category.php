@@ -53,11 +53,13 @@ final class Category
     public static function create(array $data): int
     {
         $stmt = Database::connection()->prepare(
-            'INSERT INTO categories (name, slug, image, sort_order, is_active)
-             VALUES (:name, :slug, :image, :sort_order, :is_active)'
+            'INSERT INTO categories (name, name_ru, name_en, slug, image, sort_order, is_active)
+             VALUES (:name, :name_ru, :name_en, :slug, :image, :sort_order, :is_active)'
         );
         $stmt->execute([
             'name' => $data['name'],
+            'name_ru' => $data['name_ru'] ?? null,
+            'name_en' => $data['name_en'] ?? null,
             'slug' => $data['slug'],
             'image' => $data['image'] ?? null,
             'sort_order' => (int) ($data['sort_order'] ?? 0),
@@ -70,13 +72,16 @@ final class Category
     {
         $stmt = Database::connection()->prepare(
             'UPDATE categories
-             SET name = :name, slug = :slug, image = :image,
+             SET name = :name, name_ru = :name_ru, name_en = :name_en,
+                 slug = :slug, image = :image,
                  sort_order = :sort_order, is_active = :is_active
              WHERE id = :id'
         );
         return $stmt->execute([
             'id' => $id,
             'name' => $data['name'],
+            'name_ru' => $data['name_ru'] ?? null,
+            'name_en' => $data['name_en'] ?? null,
             'slug' => $data['slug'],
             'image' => $data['image'] ?? null,
             'sort_order' => (int) ($data['sort_order'] ?? 0),

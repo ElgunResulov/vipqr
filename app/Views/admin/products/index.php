@@ -34,6 +34,15 @@
                             <img src="<?= e(upload_url($product['image'] ?? null)) ?>" alt="" width="48" height="48" class="rounded object-fit-cover">
                             <div>
                                 <strong><?= e($product['name']) ?></strong>
+                                <?php if (!empty($product['is_featured'])): ?>
+                                    <span class="badge rounded-pill text-bg-warning ms-1">Şef</span>
+                                <?php endif; ?>
+                                <?php if (!empty($product['is_popular'])): ?>
+                                    <span class="badge rounded-pill text-bg-danger ms-1">Populyar</span>
+                                <?php endif; ?>
+                                <?php if ((int) ($product['view_count'] ?? 0) > 0): ?>
+                                    <div class="small text-muted"><?= (int) $product['view_count'] ?> baxış</div>
+                                <?php endif; ?>
                                 <?php if (empty($product['is_available'])): ?>
                                     <div class="small text-warning">Mövcud deyil</div>
                                 <?php endif; ?>

@@ -126,12 +126,16 @@ final class CategoryController extends Controller
     private function validate(array $input, ?int $excludeId = null): ?array
     {
         $name = trim((string) ($input['name'] ?? ''));
+        $nameRu = trim((string) ($input['name_ru'] ?? ''));
+        $nameEn = trim((string) ($input['name_en'] ?? ''));
         $slug = trim((string) ($input['slug'] ?? ''));
         $sortOrder = (int) ($input['sort_order'] ?? 0);
         $isActive = isset($input['is_active']) ? 1 : 0;
 
         store_old([
             'name' => $name,
+            'name_ru' => $nameRu,
+            'name_en' => $nameEn,
             'slug' => $slug,
             'sort_order' => (string) $sortOrder,
             'is_active' => (string) $isActive,
@@ -155,6 +159,8 @@ final class CategoryController extends Controller
 
         return [
             'name' => $name,
+            'name_ru' => $nameRu !== '' ? $nameRu : null,
+            'name_en' => $nameEn !== '' ? $nameEn : null,
             'slug' => $slug,
             'sort_order' => $sortOrder,
             'is_active' => $isActive,

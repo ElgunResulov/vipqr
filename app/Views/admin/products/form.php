@@ -2,19 +2,33 @@
 $isEdit = $product !== null;
 $action = $isEdit ? url('admin/products/' . $product['id']) : url('admin/products');
 $name = old('name', $isEdit ? (string) $product['name'] : '');
+$nameRu = old('name_ru', $isEdit ? (string) ($product['name_ru'] ?? '') : '');
+$nameEn = old('name_en', $isEdit ? (string) ($product['name_en'] ?? '') : '');
 $description = old('description', $isEdit ? (string) ($product['description'] ?? '') : '');
+$descriptionRu = old('description_ru', $isEdit ? (string) ($product['description_ru'] ?? '') : '');
+$descriptionEn = old('description_en', $isEdit ? (string) ($product['description_en'] ?? '') : '');
 $categoryId = old('category_id', $isEdit ? (string) $product['category_id'] : '');
 $price = old('price', $isEdit ? (string) $product['price'] : '');
 $sort = old('sort_order', $isEdit ? (string) $product['sort_order'] : '0');
 $active = old('is_active', $isEdit ? (string) $product['is_active'] : '1') === '1';
 $available = old('is_available', $isEdit ? (string) $product['is_available'] : '1') === '1';
+$featured = old('is_featured', $isEdit ? (string) ($product['is_featured'] ?? '0') : '0') === '1';
+$popular = old('is_popular', $isEdit ? (string) ($product['is_popular'] ?? '0') : '0') === '1';
 ?>
 <form method="post" action="<?= e($action) ?>" enctype="multipart/form-data" class="admin-form bg-white border rounded-3 p-4">
     <?= csrf_field() ?>
     <div class="row g-3">
-        <div class="col-md-6">
-            <label class="form-label" for="name">Ad *</label>
+        <div class="col-md-4">
+            <label class="form-label" for="name">Ad (AZ) *</label>
             <input class="form-control" type="text" id="name" name="name" value="<?= e($name) ?>" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="name_ru">Ad (RU)</label>
+            <input class="form-control" type="text" id="name_ru" name="name_ru" value="<?= e($nameRu) ?>">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="name_en">Ad (EN)</label>
+            <input class="form-control" type="text" id="name_en" name="name_en" value="<?= e($nameEn) ?>">
         </div>
         <div class="col-md-6">
             <label class="form-label" for="category_id">Kateqoriya *</label>
@@ -28,8 +42,16 @@ $available = old('is_available', $isEdit ? (string) $product['is_available'] : '
             </select>
         </div>
         <div class="col-12">
-            <label class="form-label" for="description">Təsvir</label>
-            <textarea class="form-control" id="description" name="description" rows="3"><?= e($description) ?></textarea>
+            <label class="form-label" for="description">Təsvir (AZ)</label>
+            <textarea class="form-control" id="description" name="description" rows="2"><?= e($description) ?></textarea>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="description_ru">Təsvir (RU)</label>
+            <textarea class="form-control" id="description_ru" name="description_ru" rows="2"><?= e($descriptionRu) ?></textarea>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label" for="description_en">Təsvir (EN)</label>
+            <textarea class="form-control" id="description_en" name="description_en" rows="2"><?= e($descriptionEn) ?></textarea>
         </div>
         <div class="col-md-4">
             <label class="form-label" for="price">Qiymət (AZN) *</label>
@@ -39,7 +61,7 @@ $available = old('is_available', $isEdit ? (string) $product['is_available'] : '
             <label class="form-label" for="sort_order">Sıra</label>
             <input class="form-control" type="number" id="sort_order" name="sort_order" value="<?= e($sort) ?>">
         </div>
-        <div class="col-md-4 d-flex align-items-end gap-3">
+        <div class="col-md-4 d-flex flex-wrap align-items-end gap-3">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" <?= $active ? 'checked' : '' ?>>
                 <label class="form-check-label" for="is_active">Aktiv</label>
@@ -48,6 +70,20 @@ $available = old('is_available', $isEdit ? (string) $product['is_available'] : '
                 <input class="form-check-input" type="checkbox" id="is_available" name="is_available" value="1" <?= $available ? 'checked' : '' ?>>
                 <label class="form-check-label" for="is_available">Mövcuddur</label>
             </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured" value="1" <?= $featured ? 'checked' : '' ?>>
+                <label class="form-check-label" for="is_featured">Şef tövsiyəsi</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="is_popular" name="is_popular" value="1" <?= $popular ? 'checked' : '' ?>>
+                <label class="form-check-label" for="is_popular">Populyar</label>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-text">Şef tövsiyəsi: max 2 · Populyar (əl ilə): max 6. Baxış sayı avtomatik toplanır.</div>
+            <?php if ($isEdit): ?>
+                <div class="form-text">Baxış sayı: <strong><?= (int) ($product['view_count'] ?? 0) ?></strong></div>
+            <?php endif; ?>
         </div>
         <div class="col-md-6">
             <label class="form-label" for="image">Şəkil</label>
